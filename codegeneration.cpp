@@ -9,7 +9,13 @@ using namespace std;
 // Refer to project description for exact details.
 
 void CodeGenerator::visitProgramNode(ProgramNode* node) {
-    cout<< "  .globl Main_main" << endl;
+
+    #if __APPLE__
+        cout<< "  .globl _Main_main" << endl;
+    #else
+        cout<< "  .globl Main_main" << endl;
+    #endif
+
     // WRITEME: Replace with code if necessary
     // Func Prolog -> visit_children -> Func Epilog
     //
@@ -43,7 +49,14 @@ void CodeGenerator::visitMethodNode(MethodNode* node) {
     currentMethodInfo = currentClassInfo.methods[currentMethodName];
 
     cout << "  ##### method (func pro)" << endl;
-    cout << "  " << currentClassName << "_" << currentMethodName <<":"<<endl;
+
+
+    #if __APPLE__
+        cout << "  _" << currentClassName << "_" << currentMethodName <<":"<<endl;
+    #else
+        cout << "  " << currentClassName << "_" << currentMethodName <<":"<<endl;
+    #endif
+
     // 1. Push the current frame pointer value onto the stack
     cout << "  push %ebp" << endl;
     
