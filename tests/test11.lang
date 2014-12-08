@@ -1,0 +1,113 @@
+BinaryTreeNode {
+  int value
+  BinaryTreeNode left
+  BinaryTreeNode right
+  bool isEmpty
+
+  setLeft(BinaryTreeNode l) : none {
+    left = l
+  }
+
+  setRight(BinaryTreeNode r) : none {
+    right = r
+  }
+
+  setValue(int n) : none {
+    value = n
+  } 
+
+  setIsEmpty(bool b) : none {
+    isEmpty = b
+  } 
+}
+
+BinaryTree {
+  BinaryTreeNode root
+  BinaryTreeNode empty
+
+  construct() : none {
+    BinaryTreeNode e 
+    e = new BinaryTreeNode
+    e.setIsEmpty(true)
+    empty = e
+    root = e
+  }
+
+  insert(int n) : none {
+    BinaryTreeNode node
+    if root.isEmpty {
+      root = makeNewNode(n)
+    }
+    else {
+      insert2(n, root)
+    }
+  }
+
+  makeNewNode(int n) : BinaryTreeNode {
+    BinaryTreeNode node
+
+    node = new BinaryTreeNode
+    node.setValue(n)
+    node.setIsEmpty(false)
+    node.setLeft(empty)
+    node.setRight(empty)
+
+    return node
+  }
+
+  insert2(int n, BinaryTreeNode node) : none {
+    BinaryTreeNode left, right
+    left = node.left
+    right = node.right
+
+    if n < node.value {
+      if left.isEmpty {
+        node.setLeft(makeNewNode(n))
+      } else {
+        insert2(n, node.left)
+      }
+    }
+    else {if node.value < n {
+      if right.isEmpty {
+        node.setRight(makeNewNode(n))
+      } else {
+        insert2(n, node.right)
+      }
+    }}
+  }
+
+  traverse() : none {
+    traverse2(root)
+  }
+
+  traverse2(BinaryTreeNode n) : none {
+    if not n.isEmpty {
+      traverse2(n.left)
+      print n.value
+      traverse2(n.right)
+    }
+  }
+}
+
+Main {
+  main() : int {
+    BinaryTree bt 
+
+    bt = new BinaryTree
+
+    bt.construct()
+    bt.insert(5)
+    bt.insert(7)
+    bt.insert(1)
+    bt.insert(3)
+    bt.insert(2)
+    bt.insert(8)
+    bt.insert(6)
+    bt.insert(9)
+    bt.insert(4)
+    bt.insert(10)
+    bt.traverse()
+
+    return 0
+  }
+}

@@ -1,0 +1,96 @@
+LinkedListNode {
+  int value
+  LinkedListNode next
+  bool isNull
+
+  setIsNull(bool b) : none {
+    isNull = b
+  }
+
+  setNext(LinkedListNode n) : none {
+    next = n
+  }
+
+  setValue(int n) : none {
+    value = n
+  }  
+}
+
+LinkedList {
+  LinkedListNode head
+  LinkedListNode null
+
+  construct() : none {
+    LinkedListNode e
+    e = new LinkedListNode
+    e.setIsNull(true)
+
+    null = e
+    head = e
+  }
+
+  insert(int n) : none {
+    LinkedListNode node
+    if head.isNull {
+      head = makeNewNode(n)
+    }
+    else {
+      insert2(n, head)
+    }
+  }
+
+  makeNewNode(int n) : LinkedListNode {
+    LinkedListNode node
+
+    node = new LinkedListNode
+    node.setIsNull(false)
+    node.setValue(n)
+    node.setNext(null)
+
+    return node
+  }
+
+  insert2(int n, LinkedListNode node) : none {
+    LinkedListNode next
+    next = node.next
+    if next.isNull {
+      node.setNext(makeNewNode(n))
+    } else {
+      insert2(n, node.next)
+    }
+  }
+
+  traverse() : none {
+    traverse2(head)
+  }
+
+  traverse2(LinkedListNode n) : none {
+    if not n.isNull {
+      print n.value
+      traverse2(n.next)
+    }
+  }
+}
+
+Main {
+  main() : int {
+    LinkedList ll
+
+    ll = new LinkedList
+
+    ll.construct()
+    ll.insert(5)
+    ll.insert(7)
+    ll.insert(1)
+    ll.insert(3)
+    ll.insert(2)
+    ll.insert(8)
+    ll.insert(6)
+    ll.insert(9)
+    ll.insert(4)
+    ll.insert(10)
+    ll.traverse()
+
+    return 0
+  }
+}

@@ -1,0 +1,31 @@
+A {
+  int a
+
+  setA(int v) : none {
+    a = v
+  }
+}
+
+B : A {
+}
+
+Main {
+  main() : int {
+    A a1
+    A a2
+    B b
+
+    a1 = new A
+    a2 = new B
+    b  = new B
+    a1.setA(1)
+    a2.setA(2)
+    b.setA(3)
+
+    print a1.a
+    print a2.a
+    print  b.a
+
+    return 0
+  }
+}

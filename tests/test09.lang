@@ -1,0 +1,14 @@
+Main {
+  main() : int {
+    bool todayWasGonnaBeTheDay
+    bool theyllThrowItBackToMe
+
+    todayWasGonnaBeTheDay = true
+    theyllThrowItBackToMe = false
+
+    print todayWasGonnaBeTheDay
+	print theyllThrowItBackToMe
+
+    return 0
+  }
+}

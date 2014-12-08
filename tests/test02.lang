@@ -1,0 +1,7 @@
+Main {
+main() : int {
+int x
+x = (2) + 5 / 4
+return x
+}
+}

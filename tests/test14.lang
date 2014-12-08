@@ -1,0 +1,25 @@
+Main {
+  main() : int {
+    bool b1, b2, b3, b4
+
+    b1 = true
+    b2 = false
+    b3 = b1 and b2
+    b4 = b1 or b2
+
+    if b1 {
+      print 1
+    }
+    if b2 {
+      print 2
+    }
+    if b3 {
+      print 3
+    }
+    if b4 {
+      print 4
+    }
+
+    return 0
+  }
+}

@@ -1,0 +1,46 @@
+Test {
+  int theRoof
+  int theRoof2
+  int theRoof3
+
+  setRoof(int i) : none {
+    theRoof = i
+  }
+  setRoof2(int i) : none {
+    theRoof2 = i
+  }
+  setRoof3(int i) : none {
+    theRoof3 = i
+  }
+
+  getRoof() : int {
+    return theRoof
+  }
+  getRoof2() : int {
+    return theRoof2
+  }
+  getRoof3() : int {
+    return theRoof3
+  }
+
+  isOnFire(int r, int r2, int r3) : bool {
+    return true
+  }
+}
+
+Main {
+  main() : int {
+    Test t
+    t = new Test
+
+    t.setRoof(1)
+    t.setRoof2(2)
+    t.setRoof3(3)
+
+    if t.isOnFire(t.getRoof(), t.getRoof2(), t.getRoof3()) {
+      print true
+    }
+
+    return 0
+  }
+}
