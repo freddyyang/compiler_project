@@ -119,16 +119,42 @@ void CodeGenerator::visitAssignmentNode(AssignmentNode* node) {
 
 void CodeGenerator::visitCallNode(CallNode* node) {
     // WRITEME: Replace with code if necessary
+     node -> visit_children(this);
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitIfElseNode(IfElseNode* node) {
-    // WRITEME: Replace with code if necessary
+/*
+    //node -> visit_children(this); ?
+
+    int labl_ifElse = nextLabel();
+
+    cout << "  ### ifElse" << endl;
+    cout << "  pop %eax"   << endl;     // pop out the expression?
+    cout << "  mov $0, %ebx" <<endl;    // set ebx to False
+    cout << "  je ELSE_"<< label1 << endl; //if false jumps to lable1 (means skip if to lable1)
+    
+    // IF:
+    //# Visit and generate code for
+    //# statements in true branch
+    //node -> visit_children(this); ?
+    cout << "  jmp endIfELSE_" <<labl_ifElse << endl;    
+
+    cout << "  ELSE_" << labl_ifElse << ":" <<endl; //instruction after if
+    // ELSE:
+    // CODE in ELSE part of IF-ELSE
+    // node -> visit_children(this); ?
+
+    cout << "  endIfELSE_" << labl_ifElse << ":" << endl;    
+*/
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitForNode(ForNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitPrintNode(PrintNode* node) {
     // WRITEME: Replace with code if necessary
 }
@@ -174,28 +200,102 @@ void CodeGenerator::visitDivideNode(DivideNode* node) {
     std::cout << "  push %eax" << std::endl;
 }
 
+
+// ############################# PROJ_6, maybeDone
 void CodeGenerator::visitLessNode(LessNode* node) {
-    // WRITEME: Replace with code if necessary
+
+    node->visit_children(this);
+    int labl_lessThan = nextLabel();
+
+    cout << "  ### LessThan" << endl;
+    cout << "  pop %eax" << endl;
+    cout << "  pop %ebx" << endl;
+    cout << "  cmp %eax, %ebx" << endl;
+    cout << "  jl ifLess_" << labl_lessThan << endl;
+
+    // if not less, false -> 0
+    cout << "  push $0" << endl;
+    cout << "  jmp endLessThan_" << labl_lessThan << endl;
+ 
+    // if less, ifLess_lable1
+    cout << "  ifLess_" << labl_lessThan << endl;
+    cout << "  push $1" << endl;
+    
+    cout << "  endLessThan_" << labl_lessThan << ":" << endl;
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitLessEqualNode(LessEqualNode* node) {
-    // WRITEME: Replace with code if necessary
+
+    node->visit_children(this);
+    int labl_lessEqual = nextLabel();
+
+    cout << "  ### LessEqual" << endl;
+    cout << "  pop %eax" << endl;
+    cout << "  pop %ebx" << endl;
+    cout << "  cmp %eax, %ebx" << endl;
+    cout << "  jle ifLessEql_" << labl_lessEqual << endl;
+
+    // if not less, false -> 0
+    cout << "  push $0" << endl;
+    cout << "  jmp endLessEql_" << labl_lessEqual << endl;
+ 
+    // if less, ifLess_lable1
+    cout << "  ifLessEql_" << labl_lessEqual << endl;
+    cout << "  push $1" << endl;
+    
+    cout << "  endLessEql_" << labl_lessEqual << ":" << endl;
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitEqualNode(EqualNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
+    int labl_Equal = nextLabel();
+
+    cout << "  ### Equal" << endl;
+    cout << "  pop %eax" << endl;
+    cout << "  pop %ebx" << endl;
+    cout << "  cmp %eax, %ebx" << endl;
+    cout << "  je Equal_" << labl_Equal << endl;
+
+    // if not less, false -> 0
+    cout << "  push $0" << endl;
+    cout << "  jmp endEql_" << labl_Equal << endl;
+ 
+    // if less, ifLess_lable1
+    cout << "  Equal_" << labl_Equal << endl;
+    cout << "  push $1" << endl;
+    
+    cout << "  endEql_" << labl_Equal << ":" << endl;
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitAndNode(AndNode* node) {
-    // WRITEME: Replace with code if necessary
+    node->visit_children(this);
+    cout << "  pop %eax" <<endl;
+    cout << "  pop %ebx" <<endl;
+    cout << "  and %eax, %ebx" <<endl;
+    cout << "  push %ebx" <<endl;
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitOrNode(OrNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
+    cout << "  pop %eax" <<endl;
+    cout << "  pop %ebx" <<endl;
+    cout << "  or %eax, %ebx" <<endl;
+    cout << "  push %ebx" <<endl;
 }
 
+// ############################# PROJ_6, QUESTION, SAME AS NEG?
 void CodeGenerator::visitNotNode(NotNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
+    cout << "pop %eax" <<endl;
+    cout << "neg %eax" <<endl;
+    cout << "push %eax" <<endl;
 }
 
 void CodeGenerator::visitNegationNode(NegationNode* node) {
@@ -206,10 +306,12 @@ void CodeGenerator::visitNegationNode(NegationNode* node) {
     cout << "push %eax" <<endl;
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitMethodCallNode(MethodCallNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitMemberAccessNode(MemberAccessNode* node) {
     // WRITEME: Replace with code if necessary
 }
@@ -229,34 +331,42 @@ void CodeGenerator::visitIntegerLiteralNode(IntegerLiteralNode* node) {
     cout << "  push $" << node->integer->value << endl;
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitBooleanLiteralNode(BooleanLiteralNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitNewNode(NewNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitIntegerTypeNode(IntegerTypeNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitBooleanTypeNode(BooleanTypeNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitObjectTypeNode(ObjectTypeNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitNoneNode(NoneNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitIdentifierNode(IdentifierNode* node) {
     // WRITEME: Replace with code if necessary
 }
 
+// ############################# PROJ_6
 void CodeGenerator::visitIntegerNode(IntegerNode* node) {
     // WRITEME: Replace with code if necessary
 }
