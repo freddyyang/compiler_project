@@ -150,7 +150,7 @@ Assignment : IDENTIFIER EQL Expression
     {$$ = new AssignmentNode($1,$3);}
     ;
 
-ifElse : IF Expression OPENBRACE Statements CLOSEBRACE {$$ = new IfElseNode($2,$4,NULL);}
+ifElse : IF Expression OPENBRACE Statements CLOSEBRACE {$$ = new IfElseNode($2,$4,new std::list<StatementNode*> ());}
      | IF Expression OPENBRACE Statements CLOSEBRACE ELSE OPENBRACE Statements CLOSEBRACE
      {$$ = new IfElseNode($2,$4,$8);}
      ;

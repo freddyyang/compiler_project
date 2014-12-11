@@ -19,7 +19,6 @@ Main {
     if b4 {
       print 4
     }
-
     return 0
   }
 }

@@ -10,6 +10,10 @@ using namespace std;
 
 void CodeGenerator::visitProgramNode(ProgramNode* node) {
 
+    cout<< "  .data" << endl;
+    cout<< "  printstr: .asciz \"%d\n\"" << endl;
+    cout<< "  .text" << endl;
+
     #if __APPLE__
         cout<< "  .globl _Main_main" << endl;
     #else
@@ -124,29 +128,33 @@ void CodeGenerator::visitCallNode(CallNode* node) {
 
 // ############################# PROJ_6
 void CodeGenerator::visitIfElseNode(IfElseNode* node) {
-/*
+
     //node -> visit_children(this); ?
+
+    node -> expression -> accept(this);
 
     int labl_ifElse = nextLabel();
 
     cout << "  ### ifElse" << endl;
     cout << "  pop %eax"   << endl;     // pop out the expression?
     cout << "  mov $0, %ebx" <<endl;    // set ebx to False
-    cout << "  je ELSE_"<< label1 << endl; //if false jumps to lable1 (means skip if to lable1)
+    cout << "  je ELSE_"<< labl_ifElse << endl; //if false jumps to lable1 (means skip if to lable1)
     
     // IF:
     //# Visit and generate code for
     //# statements in true branch
-    //node -> visit_children(this); ?
-    cout << "  jmp endIfELSE_" <<labl_ifElse << endl;    
+    for (std::list<StatementNode*>::iterator iter = node -> statement_list_1 ->begin(); iter!= node-> statement_list_1 -> end(); iter++)
+        (*iter)  -> accept(this);
 
+    cout << "  jmp endIfELSE_" <<labl_ifElse << endl;    
     cout << "  ELSE_" << labl_ifElse << ":" <<endl; //instruction after if
     // ELSE:
     // CODE in ELSE part of IF-ELSE
-    // node -> visit_children(this); ?
+    for (std::list<StatementNode*>::iterator iter = node -> statement_list_2 ->begin(); iter!= node-> statement_list_2 -> end(); iter++)
+        (*iter)  -> accept(this);
 
     cout << "  endIfELSE_" << labl_ifElse << ":" << endl;    
-*/
+
 }
 
 // ############################# PROJ_6
@@ -157,6 +165,11 @@ void CodeGenerator::visitForNode(ForNode* node) {
 // ############################# PROJ_6
 void CodeGenerator::visitPrintNode(PrintNode* node) {
     // WRITEME: Replace with code if necessary
+    node -> visit_children(this);
+    std::cout << "  ##### PRINT" << std::endl;
+    std::cout << "  push $printstr" << std::endl;
+    std::cout << "  call printf" << std::endl;
+
 }
 
 void CodeGenerator::visitPlusNode(PlusNode* node) {
@@ -241,7 +254,7 @@ void CodeGenerator::visitLessEqualNode(LessEqualNode* node) {
     cout << "  jmp endLessEql_" << labl_lessEqual << endl;
  
     // if less, ifLess_lable1
-    cout << "  ifLessEql_" << labl_lessEqual << endl;
+    cout << "  ifLessEql_" << labl_lessEqual << ":" << endl;
     cout << "  push $1" << endl;
     
     cout << "  endLessEql_" << labl_lessEqual << ":" << endl;
@@ -294,7 +307,7 @@ void CodeGenerator::visitNotNode(NotNode* node) {
     // WRITEME: Replace with code if necessary
     node->visit_children(this);
     cout << "pop %eax" <<endl;
-    cout << "neg %eax" <<endl;
+    cout << "not %eax" <<endl;
     cout << "push %eax" <<endl;
 }
 
@@ -334,6 +347,9 @@ void CodeGenerator::visitIntegerLiteralNode(IntegerLiteralNode* node) {
 // ############################# PROJ_6
 void CodeGenerator::visitBooleanLiteralNode(BooleanLiteralNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
+    cout << "  ##### BooleanLiteral" << endl;
+    cout << "  push $" << node->integer->value << endl;
 }
 
 // ############################# PROJ_6
@@ -344,29 +360,35 @@ void CodeGenerator::visitNewNode(NewNode* node) {
 // ############################# PROJ_6
 void CodeGenerator::visitIntegerTypeNode(IntegerTypeNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
 }
 
 // ############################# PROJ_6
 void CodeGenerator::visitBooleanTypeNode(BooleanTypeNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
 }
 
 // ############################# PROJ_6
 void CodeGenerator::visitObjectTypeNode(ObjectTypeNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
 }
 
 // ############################# PROJ_6
 void CodeGenerator::visitNoneNode(NoneNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
 }
 
 // ############################# PROJ_6
 void CodeGenerator::visitIdentifierNode(IdentifierNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
 }
 
 // ############################# PROJ_6
 void CodeGenerator::visitIntegerNode(IntegerNode* node) {
     // WRITEME: Replace with code if necessary
+    node->visit_children(this);
 }

@@ -2,7 +2,7 @@ BISON	= bison -d -v
 FLEX	= flex
 CC		= gcc
 CXX		= g++
-FLAGS   = # add the -g flag to compile with debugging output for gdb
+FLAGS   = -g # add the -g flag to compile with debugging output for gdb
 TARGET	= lang
 
 OBJS = ast.o parser.o lexer.o symbol.o codegen.o main.o

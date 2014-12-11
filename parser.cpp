@@ -1631,7 +1631,7 @@ yyreduce:
 
   case 28:
 #line 153 "parser.y"
-    {(yyval.ifelse_ptr) = new IfElseNode((yyvsp[(2) - (5)].expression_ptr),(yyvsp[(4) - (5)].statement_list_ptr),NULL);;}
+    {(yyval.ifelse_ptr) = new IfElseNode((yyvsp[(2) - (5)].expression_ptr),(yyvsp[(4) - (5)].statement_list_ptr),new std::list<StatementNode*> ());;}
     break;
 
   case 29:
