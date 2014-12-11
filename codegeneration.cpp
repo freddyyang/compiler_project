@@ -130,14 +130,11 @@ void CodeGenerator::visitCallNode(CallNode* node) {
 void CodeGenerator::visitIfElseNode(IfElseNode* node) {
 
     //node -> visit_children(this); ?
-
-    node -> expression -> accept(this);
-
     int labl_ifElse = nextLabel();
-
+    node -> expression -> accept(this);
     cout << "  ### ifElse" << endl;
     cout << "  pop %eax"   << endl;     // pop out the expression?
-    cout << "  mov $0, %ebx" <<endl;    // set ebx to False
+    cout << "  cmp $0, %eax" <<endl;
     cout << "  je ELSE_"<< labl_ifElse << endl; //if false jumps to lable1 (means skip if to lable1)
     
     // IF:
@@ -159,7 +156,42 @@ void CodeGenerator::visitIfElseNode(IfElseNode* node) {
 
 // ############################# PROJ_6
 void CodeGenerator::visitForNode(ForNode* node) {
-    // WRITEME: Replace with code if necessary
+  
+    cout << "  ##### ForLoop" << endl;
+    
+    // for (i = 0; i < 10; i ++)
+
+    int labl_forLoop = nextLabel();
+    //## assignment_1
+    node -> assignment_1 -> expression -> accept(this);
+    cout << "  pop %eax" << endl;
+    cout << "  mov %eax,"<< (currentMethodInfo.variables[node->assignment_1 -> identifier -> name]).offset << "(%ebp)" << endl;
+
+    // startLoop :
+    cout << "  startLoop_" << labl_forLoop << ":" << endl;   
+
+    //## expression
+    node -> expression -> accept(this);
+    cout << "  pop %ebx" << endl;
+    cout << "  cmp $0, %ebx" << endl;
+    cout << "  je endLoop_" << labl_forLoop << endl;
+
+    // IN LOOP
+    // ## statement_list
+    for (std::list<StatementNode*>::iterator iter = node -> statement_list ->begin(); iter!= node-> statement_list -> end(); iter++)
+        (*iter)  -> accept(this);
+
+    //## assignment_2 Increment
+    node -> assignment_2 -> expression -> accept(this);
+    cout << "  pop %eax" << endl;
+    cout << "  mov %eax,"<< (currentMethodInfo.variables[node->assignment_2 -> identifier -> name]).offset << "(%ebp)" << endl;
+
+    // Loop again after increment
+    cout << "  jmp startLoop_" << labl_forLoop << endl;
+
+    // endLoop :
+    cout << "  endLoop_" << labl_forLoop << ":" << endl; 
+
 }
 
 // ############################# PROJ_6
@@ -322,6 +354,7 @@ void CodeGenerator::visitNegationNode(NegationNode* node) {
 // ############################# PROJ_6
 void CodeGenerator::visitMethodCallNode(MethodCallNode* node) {
     // WRITEME: Replace with code if necessary
+    
 }
 
 // ############################# PROJ_6
