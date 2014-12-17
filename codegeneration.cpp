@@ -353,13 +353,82 @@ void CodeGenerator::visitNegationNode(NegationNode* node) {
 
 // ############################# PROJ_6
 void CodeGenerator::visitMethodCallNode(MethodCallNode* node) {
-    // WRITEME: Replace with code if necessary
     
+    int size = 4;
+    // cout << "  push %ecx" <<endl; //saving caller-save register
+    // cout << "  push %edx" <<endl;
+
+    for (std::list<ExpressionNode*>::iterator iter = node -> expression_list ->end(); iter!= node-> expression_list -> begin(); iter++)
+    {
+       (*iter)  -> accept(this);
+       size += 4;
+    }
+    
+    // Foo.bar(): 1> Foo.bar(), 2> bar()
+    // 1> Foo.bar() If call the method with the class
+    if (node-> identifier_1 != NULL)
+    {
+
+        //classinfo.methods.find(methodname) != classinfo.methods.end()
+
+        //if (currentMethodInfo.returnType.baseType == bt_object)
+        
+        // call class_method
+
+        //std::string className = node-> identifier_1 ->name;
+        
+        std::string memberName = node-> identifier_1 ->name;
+        std::string methodName = node-> identifier_2 ->name;
+        //std::string className = info.members[memberName].type.objectClassName;
+         std::string className = memberName;
+
+        for(std::map<std::string, ClassInfo>::iterator iterator = classTable->begin(); iterator != classTable->end(); iterator++) {
+            if (iterator->second.members.find(memberName) != iterator->second.members.end())
+                className = iterator->second.members[memberName].type.objectClassName;
+        }
+
+        // push the self pointer
+        // Foo.bar -> 2 types of Foo
+        // 1st Case: Foo is local
+        // 2nd Case: Foo is classMember
+
+        // if found method in current class, then local
+        if (currentClassInfo.methods.find(methodName) != currentClassInfo.methods.end())
+            cout << "push " << (currentClassInfo.members[node -> identifier_2 -> name]).offset << "(%ebp)" << endl;
+        else
+            cout << "push " << (currentMethodInfo.variables[node -> identifier_2 -> name]).offset << "(%ebp)" << endl;
+
+        cout << "  call " << className << "_" << methodName << endl;
+        cout << "  add " << size << ", %esp" <<endl;
+        cout << "  push %eax" << endl;
+        // cout << "  pop %edx" << endl;
+        // cout << "  pop %ecx" << endl;
+        // cout << "  push %eax"<< endl; //put return value on operand stack
+    }
+
+    // 2> if only calls the method- Bar() 
+    else
+    {
+        // push the self pointer
+        cout << "push $8(%ebp)" << endl;
+
+        // call class_method
+        std::string methodName = node-> identifier_2 ->name;
+
+        cout << "  call " << currentClassName << "_" << methodName << endl;
+        cout << "  add " << size << ", %esp" <<endl;
+        cout << "  push %eax" <<endl;        
+        // cout << "  pop %edx" <<endl;
+        // cout << "  pop %ecx" <<endl;
+        // cout << "  push %eax"<<endl; //put return value on operand stack
+    }
 }
 
 // ############################# PROJ_6
 void CodeGenerator::visitMemberAccessNode(MemberAccessNode* node) {
     // WRITEME: Replace with code if necessary
+
+
 }
 
 void CodeGenerator::visitVariableNode(VariableNode* node) {
