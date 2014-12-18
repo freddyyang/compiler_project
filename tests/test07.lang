@@ -10,6 +10,7 @@ Count {
 Main {
   main() : int {
     Count c
+    c = new Count
     c.count()
     return 0
   }

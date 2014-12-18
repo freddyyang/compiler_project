@@ -11,7 +11,7 @@ using namespace std;
 void CodeGenerator::visitProgramNode(ProgramNode* node) {
 
     cout<< "  .data" << endl;
-    cout<< "  printstr: .asciz \"%d\n\"" << endl;
+    cout<< "  printstr: .asciz \"%d\\n\"" << endl;
     cout<< "  .text" << endl;
 
     #if __APPLE__
@@ -85,6 +85,10 @@ void CodeGenerator::visitMethodNode(MethodNode* node) {
     // cout << "  mov %ebp, %esp" <<endl;      // 2. Deallocate local variable space
     // cout << "  pop %ebp" <<endl;            // 3. Restore previous frame pointer value
     // cout << "  ret" <<endl;                 // 4. Pop return address and jump to it
+
+    cout << "  mov %ebp, %esp" <<endl;      // 2. Deallocate local variable space
+    cout << "  pop %ebp" <<endl;            // 3. Restore previous frame pointer value
+    cout << "  ret" <<endl;                 // 4. Pop return address and jump to it
 }
 
 void CodeGenerator::visitMethodBodyNode(MethodBodyNode* node) {
@@ -107,9 +111,10 @@ void CodeGenerator::visitReturnStatementNode(ReturnStatementNode* node) {
     node -> visit_children(this); 
     cout << "  ##### return states (func epi)" << endl;
     cout << "  pop %eax" << endl;           // 1. Put return value in known register
-    cout << "  mov %ebp, %esp" <<endl;      // 2. Deallocate local variable space
-    cout << "  pop %ebp" <<endl;            // 3. Restore previous frame pointer value
-    cout << "  ret" <<endl;                 // 4. Pop return address and jump to it
+    // cout << "  mov %ebp, %esp" <<endl;      // 2. Deallocate local variable space
+    // cout << "  pop %ebp" <<endl;            // 3. Restore previous frame pointer value
+    // cout << "  ret" <<endl;                 // 4. Pop return address and jump to it
+    
 }
 
 void CodeGenerator::visitAssignmentNode(AssignmentNode* node) {
@@ -124,6 +129,7 @@ void CodeGenerator::visitAssignmentNode(AssignmentNode* node) {
 void CodeGenerator::visitCallNode(CallNode* node) {
     // WRITEME: Replace with code if necessary
      node -> visit_children(this);
+     cout << "  add $4, %esp" << endl;
 }
 
 // ############################# PROJ_6
@@ -201,6 +207,7 @@ void CodeGenerator::visitPrintNode(PrintNode* node) {
     std::cout << "  ##### PRINT" << std::endl;
     std::cout << "  push $printstr" << std::endl;
     std::cout << "  call printf" << std::endl;
+    std::cout << "  add $8, %esp" <<std::endl;
 
 }
 
@@ -380,12 +387,14 @@ void CodeGenerator::visitMethodCallNode(MethodCallNode* node) {
         std::string memberName = node-> identifier_1 ->name;
         std::string methodName = node-> identifier_2 ->name;
         //std::string className = info.members[memberName].type.objectClassName;
-         std::string className = memberName;
+        std::string className = "";
 
+        /*
         for(std::map<std::string, ClassInfo>::iterator iterator = classTable->begin(); iterator != classTable->end(); iterator++) {
             if (iterator->second.members.find(memberName) != iterator->second.members.end())
                 className = iterator->second.members[memberName].type.objectClassName;
         }
+        */
 
         // push the self pointer
         // Foo.bar -> 2 types of Foo
@@ -394,12 +403,18 @@ void CodeGenerator::visitMethodCallNode(MethodCallNode* node) {
 
         // if found method in current class, then local
         if (currentClassInfo.methods.find(methodName) != currentClassInfo.methods.end())
-            cout << "push " << (currentClassInfo.members[node -> identifier_2 -> name]).offset << "(%ebp)" << endl;
+        {
+            className = currentClassInfo.members[memberName].type.objectClassName;
+            cout << "push " << (currentClassInfo.members[memberName]).offset << "(%ebp)" << endl;
+        }
         else
-            cout << "push " << (currentMethodInfo.variables[node -> identifier_2 -> name]).offset << "(%ebp)" << endl;
+        {
+            className = currentMethodInfo.variables[memberName].type.objectClassName;
+            cout << "push " << (currentMethodInfo.variables[memberName]).offset << "(%ebp)" << endl;
+        }
 
         cout << "  call " << className << "_" << methodName << endl;
-        cout << "  add " << size << ", %esp" <<endl;
+        cout << "  add $" << size << ", %esp" <<endl;
         cout << "  push %eax" << endl;
         // cout << "  pop %edx" << endl;
         // cout << "  pop %ecx" << endl;
@@ -416,7 +431,7 @@ void CodeGenerator::visitMethodCallNode(MethodCallNode* node) {
         std::string methodName = node-> identifier_2 ->name;
 
         cout << "  call " << currentClassName << "_" << methodName << endl;
-        cout << "  add " << size << ", %esp" <<endl;
+        cout << "  add $" << size << ", %esp" <<endl;
         cout << "  push %eax" <<endl;        
         // cout << "  pop %edx" <<endl;
         // cout << "  pop %ecx" <<endl;
@@ -427,8 +442,7 @@ void CodeGenerator::visitMethodCallNode(MethodCallNode* node) {
 // ############################# PROJ_6
 void CodeGenerator::visitMemberAccessNode(MemberAccessNode* node) {
     // WRITEME: Replace with code if necessary
-
-
+    
 }
 
 void CodeGenerator::visitVariableNode(VariableNode* node) {

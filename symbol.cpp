@@ -68,14 +68,14 @@ void Symbol::visitParameterNode(ParameterNode* node) {
 }
 
 void Symbol::visitDeclarationNode(DeclarationNode* node) {
+    node -> visit_children(this);
     for (std::list<IdentifierNode*>::iterator iter = node -> identifier_list->begin(); iter!= node->identifier_list -> end(); iter++)
     {
         VariableInfo variable_info;
         std::string variable_name = (*iter)->name;
+        variable_info.type.baseType = node->type->basetype;
         if ( variable_info.type.baseType == bt_object)
             variable_info.type.objectClassName = ((ObjectTypeNode*)node->type)->identifier->name;
-        else
-            variable_info.type.baseType = node->type->basetype;
         variable_info.size = 4;
         node -> visit_children(this);
         variable_info.offset = currentLocalOffset;
@@ -178,18 +178,26 @@ void Symbol::visitNewNode(NewNode* node) {
 
 void Symbol::visitIntegerTypeNode(IntegerTypeNode* node) {
     // WRITEME: Replace with code if necessary
+    node->basetype = bt_integer;
 }
 
 void Symbol::visitBooleanTypeNode(BooleanTypeNode* node) {
     // WRITEME: Replace with code if necessary
+    node->basetype = bt_boolean;
 }
 
 void Symbol::visitObjectTypeNode(ObjectTypeNode* node) {
     // WRITEME: Replace with code if necessary
+    node->basetype = bt_object;
+
 }
 
 void Symbol::visitNoneNode(NoneNode* node) {
     // WRITEME: Replace with code if necessary
+    
+    node->basetype = bt_none;
+    
+
 }
 
 void Symbol::visitIdentifierNode(IdentifierNode* node) {
