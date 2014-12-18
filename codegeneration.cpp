@@ -7,6 +7,10 @@ using namespace std;
 // NOTE: You only need to complete code for expressions,
 // assignments, returns, and local variable space allocation.
 // Refer to project description for exact details.
+/*
+lldb ./lang 
+(lldb) run <tests/test08.lang
+*/
 
 void CodeGenerator::visitProgramNode(ProgramNode* node) {
 
@@ -120,10 +124,25 @@ void CodeGenerator::visitReturnStatementNode(ReturnStatementNode* node) {
 void CodeGenerator::visitAssignmentNode(AssignmentNode* node) {
     // WRITEME: Replace with code if necessary
     node -> visit_children(this);
+    std::string nodeName = node->identifier->name;
     cout << "  ##### assignment " << endl;
-    cout << "  pop %eax" << endl;
-    cout << "  mov %eax,"<< (currentMethodInfo.variables[node->identifier->name]).offset
-    << "(%ebp)" << endl;
+    if (currentClassInfo.members.find(nodeName) != currentClassInfo.members.end())
+    {
+        cout << "  pop %eax" << endl;
+        cout << "  mov 8(%ebp), %ebx" <<endl;
+        cout << "  mov %eax,"<< (currentClassInfo.members[nodeName]).offset
+        << "(%ebx)" << endl;
+    }
+    else
+    {
+        cout << "  pop %eax" << endl;
+        cout << "  mov %eax,"<< (currentMethodInfo.variables[nodeName]).offset
+        << "(%ebp)" << endl; 
+        // cout << "  pop %eax" << endl;
+        // cout << "  mov 8(%ebp), %ebx" <<endl;
+        // cout << "  mov %eax,"<< (currentClassInfo.members[nodeName]).offset
+        // << "(%ebp)" << endl;   
+    }
 }
 
 void CodeGenerator::visitCallNode(CallNode* node) {
@@ -270,12 +289,22 @@ void CodeGenerator::visitLessNode(LessNode* node) {
     cout << "  jmp endLessThan_" << labl_lessThan << endl;
  
     // if less, ifLess_lable1
-    cout << "  ifLess_" << labl_lessThan << endl;
+    cout << "  ifLess_" << labl_lessThan << ":" << endl;
     cout << "  push $1" << endl;
     
     cout << "  endLessThan_" << labl_lessThan << ":" << endl;
 }
-
+/*
+    if 1 < 5{
+      print 5    
+    }
+    if 1 < 5{
+      print 5    
+    }
+    if 1 < 5{
+      print 5    
+    }
+    */
 // ############################# PROJ_6
 void CodeGenerator::visitLessEqualNode(LessEqualNode* node) {
 
@@ -362,95 +391,119 @@ void CodeGenerator::visitNegationNode(NegationNode* node) {
 void CodeGenerator::visitMethodCallNode(MethodCallNode* node) {
     
     int size = 4;
-    // cout << "  push %ecx" <<endl; //saving caller-save register
-    // cout << "  push %edx" <<endl;
 
-    for (std::list<ExpressionNode*>::iterator iter = node -> expression_list ->end(); iter!= node-> expression_list -> begin(); iter++)
+    std::string className = "";
+
+    cout << "  ##### Method Call" <<endl;
+    cout << "  push %ecx" <<endl; //saving caller-save register
+    cout << "  push %edx" <<endl;
+
+    for (std::list<ExpressionNode*>::reverse_iterator iter = node -> expression_list ->rbegin(); iter!= node-> expression_list -> rend(); iter++)
     {
-       (*iter)  -> accept(this);
+       (*iter) -> accept(this);
        size += 4;
     }
     
     // Foo.bar(): 1> Foo.bar(), 2> bar()
     // 1> Foo.bar() If call the method with the class
-    if (node-> identifier_1 != NULL)
+    if (node-> identifier_2 != NULL)
     {
 
-        //classinfo.methods.find(methodname) != classinfo.methods.end()
-
-        //if (currentMethodInfo.returnType.baseType == bt_object)
-        
         // call class_method
-
-        //std::string className = node-> identifier_1 ->name;
-        
         std::string memberName = node-> identifier_1 ->name;
         std::string methodName = node-> identifier_2 ->name;
         //std::string className = info.members[memberName].type.objectClassName;
         std::string className = "";
+        std::string className1 = "";
+        std::string className2 = "";
 
-        /*
-        for(std::map<std::string, ClassInfo>::iterator iterator = classTable->begin(); iterator != classTable->end(); iterator++) {
-            if (iterator->second.members.find(memberName) != iterator->second.members.end())
-                className = iterator->second.members[memberName].type.objectClassName;
-        }
-        */
-
+        // get the actual class name from the object name, Count instead of c
+        // for(std::map<std::string, ClassInfo>::iterator iterator = classTable->begin(); iterator != classTable->end(); iterator++) {
+        //     if (iterator->second.members.find(memberName) != iterator->second.members.end())
+        //         //className = iterator->second.members[memberName].type.objectClassName;
+        //         //className = iterator->first;
+        // }
+        
         // push the self pointer
         // Foo.bar -> 2 types of Foo
         // 1st Case: Foo is local
         // 2nd Case: Foo is classMember
 
         // if found method in current class, then local
-        if (currentClassInfo.methods.find(methodName) != currentClassInfo.methods.end())
+        if (currentClassInfo.members.find(memberName) != currentClassInfo.members.end())
         {
-            className = currentClassInfo.members[memberName].type.objectClassName;
-            cout << "push " << (currentClassInfo.members[memberName]).offset << "(%ebp)" << endl;
+            cout << "  mov 8(%ebp), %ebx" << endl;
+           // className = currentClassInfo.members[memberName].type.objectClassName;
+            cout << "  push " << (currentClassInfo.members[memberName]).offset << "(%ebx)" << endl;
         }
         else
         {
-            className = currentMethodInfo.variables[memberName].type.objectClassName;
-            cout << "push " << (currentMethodInfo.variables[memberName]).offset << "(%ebp)" << endl;
+           // className = currentMethodInfo.variables[memberName].type.objectClassName;
+            cout << "  push " << (currentMethodInfo.variables[memberName]).offset << "(%ebp)" << endl;
+        }
+
+        for(std::map<std::string, ClassInfo>::iterator iterator = classTable->begin(); iterator != classTable->end(); iterator++) {
+            if (iterator->second.methods.find(methodName) != iterator->second.methods.end())
+                //className = iterator->second.members[memberName].type.objectClassName;
+                className = iterator->first;
         }
 
         cout << "  call " << className << "_" << methodName << endl;
         cout << "  add $" << size << ", %esp" <<endl;
-        cout << "  push %eax" << endl;
-        // cout << "  pop %edx" << endl;
-        // cout << "  pop %ecx" << endl;
-        // cout << "  push %eax"<< endl; //put return value on operand stack
+        cout << "  pop %edx" << endl;
+        cout << "  pop %ecx" << endl;
+        cout << "  push %eax"<< endl; //put return value on operand stack
     }
 
     // 2> if only calls the method- Bar() 
     else
     {
         // push the self pointer
-        cout << "push $8(%ebp)" << endl;
+        cout << "push 8(%ebp)" << endl;
 
         // call class_method
-        std::string methodName = node-> identifier_2 ->name;
+        std::string methodName = node-> identifier_1 ->name;
 
         cout << "  call " << currentClassName << "_" << methodName << endl;
-        cout << "  add $" << size << ", %esp" <<endl;
-        cout << "  push %eax" <<endl;        
-        // cout << "  pop %edx" <<endl;
-        // cout << "  pop %ecx" <<endl;
-        // cout << "  push %eax"<<endl; //put return value on operand stack
+        cout << "  add $" << size << ", %esp" <<endl;  
+        cout << "  pop %edx" <<endl;
+        cout << "  pop %ecx" <<endl;
+        cout << "  push %eax"<<endl; //put return value on operand stack
     }
 }
 
 // ############################# PROJ_6
 void CodeGenerator::visitMemberAccessNode(MemberAccessNode* node) {
     // WRITEME: Replace with code if necessary
-    
+    cout << "  ##### Member Access" << endl;
+    std::string id1 = node->identifier_1->name;
+    std::string memberName = node->identifier_2->name;
+    int size;
+
+    if (currentClassInfo.members.find(id1) != currentClassInfo.members.end())
+    {
+         cout << "  mov 8(%ebp), %ebx" << endl;
+         cout << "  push " << currentClassInfo.members[memberName].offset << "(%ebx)" << endl;
+    }
+    else
+    {
+        cout << "  mov " << (currentMethodInfo.variables[id1]).offset <<"(%ebp), %eax" << endl;
+        cout << "  push " << currentClassInfo.members[memberName].offset << "(%eax)"<<endl;
+    }
 }
 
 void CodeGenerator::visitVariableNode(VariableNode* node) {
     // WRITEME: Replace with code if necessary
     node->visit_children(this);
     std::string Variable_Name = node -> identifier -> name;
-    cout << "  ##### Variable " << endl; 
-    cout << "  push " << currentMethodInfo.variables[Variable_Name].offset <<"(%ebp)" <<endl; 
+    cout << "  ##### Variable " << endl;
+    if (currentClassInfo.members.find(Variable_Name) != currentClassInfo.members.end())
+    {
+       cout << "  mov 8(%ebp), %ebx" <<endl;
+        cout << "  push " << currentClassInfo.members[Variable_Name].offset <<"(%ebp)" <<endl; 
+    }
+    else    
+        cout << "  push " << currentMethodInfo.variables[Variable_Name].offset <<"(%ebp)" <<endl; 
 }
 
 void CodeGenerator::visitIntegerLiteralNode(IntegerLiteralNode* node) {
@@ -471,6 +524,12 @@ void CodeGenerator::visitBooleanLiteralNode(BooleanLiteralNode* node) {
 // ############################# PROJ_6
 void CodeGenerator::visitNewNode(NewNode* node) {
     // WRITEME: Replace with code if necessary
+    cout << "  ##### New" << endl;       
+    int size = (*classTable)[node->identifier->name].membersSize;
+    cout << "  push $" << size <<endl;        
+    cout << "  call malloc" <<endl;        
+    cout << "  add $4, %esp" <<endl;        
+    cout << "  push %eax" <<endl;      
 }
 
 // ############################# PROJ_6
